@@ -13,7 +13,7 @@
 #define MAXSIZE 1000
 #define MAX 200
 #define isunderline(c) c=='_'
-#define return_error(type) do{Row_Error = pword->row;longjmp(jmpbuf, type); }while(0)//ºó±ß¾­³£ÓÃ£¬°ü³Éºêº¯ÊıµÃÁË£¬²»Öµµ±°ü³Éº¯Êı
+#define return_error(type) do{Row_Error = pword->row;longjmp(jmpbuf, type); }while(0)//åè¾¹ç»å¸¸ç”¨ï¼ŒåŒ…æˆå®å‡½æ•°å¾—äº†ï¼Œä¸å€¼å½“åŒ…æˆå‡½æ•°
 #define istype (pword->token <= TK_KW_VOID && pword->token >= TK_KW_INT)
 using namespace std;
 
@@ -25,7 +25,7 @@ typedef struct {
 
 enum TokenCode
 {
-	//ÔËËã·ûºÍ·Ö¸ô·ûºÍEOF
+	//è¿ç®—ç¬¦å’Œåˆ†éš”ç¬¦å’ŒEOF
 	TK_START_L,//(
 	TK_END_L,//)
 	TK_START_M,//[
@@ -51,12 +51,12 @@ enum TokenCode
 	TK_LQ,//<=
 	TK_EQUL,//==
 	TK_NEQ,//!=
-	TK_AND,//&½ö×÷ÎªºÍÔËËã
+	TK_AND,//&ä»…ä½œä¸ºå’Œè¿ç®—
 	TK_XOR,//^
 	TK_OR,//|
 	TK_LAND,//&&  logic and
 	TK_LOR,//||
-	//TK_CHOICE,//?:ÏÈ¸éÖÃ°É
+	//TK_CHOICE,//?:å…ˆæç½®å§
 	TK_GIVEVAL,//=
 	TK_D_GV,// /=
 	TK_M_GV,// *=
@@ -71,13 +71,13 @@ enum TokenCode
 	TK_COMMA,//,
 	TK_EOF,//EOF
 
-	//³£Á¿
+	//å¸¸é‡
 	TK_CNUM,//CONST NUM
-	//TK_CFLOAT,float,SHORT,DOUBLEµÈ¸úint¹éÒ»ÆğºÃÁË
+	//TK_CFLOAT,float,SHORT,DOUBLEç­‰è·Ÿintå½’ä¸€èµ·å¥½äº†
 	TK_CSTRING,
 	TK_CCHAR,
 
-	//¹Ø¼ü×Ö
+	//å…³é”®å­—
 	TK_KW_INT,//KEY WORDS INT
 	TK_KW_SHORT,
 	TK_KW_CHAR,
@@ -93,7 +93,7 @@ enum TokenCode
 	TK_KW_IF,
 	TK_KW_WHILE,
 	TK_KW_ELSE,
-	//TK_KW_TYPEDEF,//typedefÄÃµ½Ç°ÃæÈ¥ÁË
+	//TK_KW_TYPEDEF,//typedefæ‹¿åˆ°å‰é¢å»äº†
 	TK_KW_DEFINE,
 	TK_KW_INCLUDE,
 	TK_KW_BREAK,
@@ -101,86 +101,86 @@ enum TokenCode
 	TK_KW_CONTINU,
 	TK_KW_ENUM,
 
-	//×¢ÊÍ
+	//æ³¨é‡Š
 	TK_MEANING,//  //
 
-	//º¯ÊıÃûºÍ±äÁ¿Ãû
-	TK_FUNCT,//º¯ÊıÃû
-	TK_VAL,//±äÁ¿Ãû
+	//å‡½æ•°åå’Œå˜é‡å
+	TK_FUNCT,//å‡½æ•°å
+	TK_VAL,//å˜é‡å
 	TK_DEFINE,//DEFINE
 	TK_INCLUDE,//INCLUDE
 }; 
 
 enum Error_type {
-	PROGRAM_BEGIN,//Ö´ĞĞÓï·¨·ÖÎö,Ä¬ÈÏ×´Ì¬Îª0Ôò½øÈëÓï·¨·ÖÎö
-	SUCC,//³É¹¦
-	SOMETHINGWRONG,	//Î´Öª´íÎó
-	LACK_SEMICOLON,	//È±ÉÙ·ÖºÅ
-	RETURN_ERROR,//returnÀàĞÍ´íÎó
-	BREAK_LACK_SEMICOLON,//breakÈ±ÉÙ·ÖºÅ
-	CONTINU_LACK_SEMICOLON,	//continueÈ±ÉÙ·ÖºÅ
-	EXTER_DEC,//Íâ²¿ÉùÃ÷´¦³öÏÖ´íÎó
-	LACK_TYPE,//È±ÉÙÀàĞÍ
-	VAL_WRONG,//±äÁ¿´íÎó
-	FUNC_WRONG,//º¯Êı´íÎó
-	LACK_IDENT,//È±ÉÙ±êÊ¶·û
-	LACK_START_L ,//È±ÉÙ×óÔ²À¨ºÅ
-	LACK_END_L,//È±ÉÙÓÒÔ²À¨ºÅ
-	LACK_START_M,//È±ÉÙ×óÖĞÀ¨ºÅ
-	LACK_END_M,//È±ÉÙÓÒÖĞÀ¨ºÅ
-	LACK_BEGIN,//È±ÉÙ×ó»¨À¨ºÅ
-	LACK_END,//È±ÉÙÓÒ»¨À¨ºÅ
-	NESTED_FUNC_DECLEAR,//º¯ÊıÇ¶Ì×¶¨Òå
-	IF_LACK_START_L,//ifÈ±ÉÙ×óÔ²À¨ºÅ
-	IF_LACK_END_L,	//ifÈ±ÉÙÓÒÔ²À¨ºÅ
-	FOR_LACK_START_L,	//forÈ±ÉÙ×óÔ²À¨ºÅ
-	FOR_LACK_END_L,	//forÈ±ÉÙÓÒÔ²À¨ºÅ
-	PRIMARY_ERROR,//³õµÈ±í´ïÊ½´íÎó
-	FUNCVAR_WRONG,//º¯Êıµ÷ÓÃ±äÁ¿´íÎó
-	LACK_ST,//È±ÉÙÓï¾ä
-	CONTINU_ERROR,//continueÊ¹ÓÃ´íÎó
-	ELSE_ERROR,//elseÊ¹ÓÃ´íÎó
-	FOR_ERROR,//forÊ¹ÓÃ´íÎó
-	WHILE_LACK_START_L,	//whileÈ±ÉÙ×óÔ²À¨ºÅ
-	WHILE_LACK_END_L,	//whileÈ±ÉÙÓÒÔ²À¨ºÅ
-	WHILE_ERROR,//whileÊ¹ÓÃ´íÎó
-	IDENTIFY_ERROR,//±êÊ¶·û´íÎó£¬²»ÄÜÒÔÊı×Ö¿ªÍ·
-	VAL_EXCESSIVE,//±äÁ¿¹ı¶à
-	VAL_ERROR,//Êı¾İ´íÎó
+	PROGRAM_BEGIN,//æ‰§è¡Œè¯­æ³•åˆ†æ,é»˜è®¤çŠ¶æ€ä¸º0åˆ™è¿›å…¥è¯­æ³•åˆ†æ
+	SUCC,//æˆåŠŸ
+	SOMETHINGWRONG,	//æœªçŸ¥é”™è¯¯
+	LACK_SEMICOLON,	//ç¼ºå°‘åˆ†å·
+	RETURN_ERROR,//returnç±»å‹é”™è¯¯
+	BREAK_LACK_SEMICOLON,//breakç¼ºå°‘åˆ†å·
+	CONTINU_LACK_SEMICOLON,	//continueç¼ºå°‘åˆ†å·
+	EXTER_DEC,//å¤–éƒ¨å£°æ˜å¤„å‡ºç°é”™è¯¯
+	LACK_TYPE,//ç¼ºå°‘ç±»å‹
+	VAL_WRONG,//å˜é‡é”™è¯¯
+	FUNC_WRONG,//å‡½æ•°é”™è¯¯
+	LACK_IDENT,//ç¼ºå°‘æ ‡è¯†ç¬¦
+	LACK_START_L ,//ç¼ºå°‘å·¦åœ†æ‹¬å·
+	LACK_END_L,//ç¼ºå°‘å³åœ†æ‹¬å·
+	LACK_START_M,//ç¼ºå°‘å·¦ä¸­æ‹¬å·
+	LACK_END_M,//ç¼ºå°‘å³ä¸­æ‹¬å·
+	LACK_BEGIN,//ç¼ºå°‘å·¦èŠ±æ‹¬å·
+	LACK_END,//ç¼ºå°‘å³èŠ±æ‹¬å·
+	NESTED_FUNC_DECLEAR,//å‡½æ•°åµŒå¥—å®šä¹‰
+	IF_LACK_START_L,//ifç¼ºå°‘å·¦åœ†æ‹¬å·
+	IF_LACK_END_L,	//ifç¼ºå°‘å³åœ†æ‹¬å·
+	FOR_LACK_START_L,	//forç¼ºå°‘å·¦åœ†æ‹¬å·
+	FOR_LACK_END_L,	//forç¼ºå°‘å³åœ†æ‹¬å·
+	PRIMARY_ERROR,//åˆç­‰è¡¨è¾¾å¼é”™è¯¯
+	FUNCVAR_WRONG,//å‡½æ•°è°ƒç”¨å˜é‡é”™è¯¯
+	LACK_ST,//ç¼ºå°‘è¯­å¥
+	CONTINU_ERROR,//continueä½¿ç”¨é”™è¯¯
+	ELSE_ERROR,//elseä½¿ç”¨é”™è¯¯
+	FOR_ERROR,//forä½¿ç”¨é”™è¯¯
+	WHILE_LACK_START_L,	//whileç¼ºå°‘å·¦åœ†æ‹¬å·
+	WHILE_LACK_END_L,	//whileç¼ºå°‘å³åœ†æ‹¬å·
+	WHILE_ERROR,//whileä½¿ç”¨é”™è¯¯
+	IDENTIFY_ERROR,//æ ‡è¯†ç¬¦é”™è¯¯ï¼Œä¸èƒ½ä»¥æ•°å­—å¼€å¤´
+	VAL_EXCESSIVE,//å˜é‡è¿‡å¤š
+	VAL_ERROR,//æ•°æ®é”™è¯¯
 };
 
-void word_analysis(FILE* fp);//½øÈë´Ê·¨·ÖÎö
-void hash_table(vector <TkWord>* hashtable, int keywordslen);//´¦Àí¹şÏ£
-void meaning_p( int* p, char* tmp_c);//´¦Àí×¢ÊÍ
-void keyword_p( int* p, char* tmp_c, vector <TkWord>* hashtable);//´¦Àí¹Ø¼ü×Ö
-void num_p(int* p, char* tmp_c, vector <TkWord>* hashtable);//´¦ÀíÊı×Ö
-void char_p(int* p, char* tmp_c);//´¦Àíchar
-void str_p(int* p, char* tmp_c);//´¦Àístr
-void else_p(int* p, char* tmp_c, vector <TkWord>* hashtable);//´¦ÀíÊ£ÏÂµÄ·ûºÅ
-void next_target(string* tmp_s, char* tmp_c, int* p);//ÏÂÒ»¸öÄ¿±ê
+void word_analysis(FILE* fp);//è¿›å…¥è¯æ³•åˆ†æ
+void hash_table(vector <TkWord>* hashtable, int keywordslen);//å¤„ç†å“ˆå¸Œ
+void meaning_p( int* p, char* tmp_c);//å¤„ç†æ³¨é‡Š
+void keyword_p( int* p, char* tmp_c, vector <TkWord>* hashtable);//å¤„ç†å…³é”®å­—
+void num_p(int* p, char* tmp_c, vector <TkWord>* hashtable);//å¤„ç†æ•°å­—
+void char_p(int* p, char* tmp_c);//å¤„ç†char
+void str_p(int* p, char* tmp_c);//å¤„ç†str
+void else_p(int* p, char* tmp_c, vector <TkWord>* hashtable);//å¤„ç†å‰©ä¸‹çš„ç¬¦å·
+void next_target(string* tmp_s, char* tmp_c, int* p);//ä¸‹ä¸€ä¸ªç›®æ ‡
 void printbegin();
-void Print(string , int );//´òÓ¡ÑÕÉ«
-void PrintWhite();//¾ä±úÔÙË¢°×
-void Compile();//Óï·¨·ÖÎöÈë¿Ú
-void External_Claim();//Íâ²¿ÉùÃ÷
-void type_judge();//ÅĞ¶ÏÍâ²¿ÉùÃ÷ÊÇ±äÁ¿»¹ÊÇº¯Êı
-void val_process(int);//´¦ÀíÉùÃ÷±äÁ¿
-void func_process();//´¦ÀíÉùÃ÷º¯Êı
-void func_val_process();//´¦ÀíĞÎ²Î
-void func_body_process();//´¦Àíº¯ÊıÌå
-void typedef_struct();//´¦Àítypedef
-void typedef_name();//´¦ÀíÖØÃüÃû
-void func_char();//´¦Àíchar
-void func_num();//´¦Àínum
+void Print(string , int );//æ‰“å°é¢œè‰²
+void PrintWhite();//å¥æŸ„å†åˆ·ç™½
+void Compile();//è¯­æ³•åˆ†æå…¥å£
+void External_Claim();//å¤–éƒ¨å£°æ˜
+void type_judge();//åˆ¤æ–­å¤–éƒ¨å£°æ˜æ˜¯å˜é‡è¿˜æ˜¯å‡½æ•°
+void val_process(int);//å¤„ç†å£°æ˜å˜é‡
+void func_process();//å¤„ç†å£°æ˜å‡½æ•°
+void func_val_process();//å¤„ç†å½¢å‚
+void func_body_process();//å¤„ç†å‡½æ•°ä½“
+void typedef_struct();//å¤„ç†typedef
+void typedef_name();//å¤„ç†é‡å‘½å
+void func_char();//å¤„ç†char
+void func_num();//å¤„ç†num
 void for_process();
 void if_process();
 void while_process();
 void else_process();
 void return_process();
 void enum_process();
-void func_func();//·ÖÎöº¯Êıµ÷ÓÃ
-void func_val();//·ÖÎöº¯Êıµ÷ÓÃÀïµÄ²ÎÊı
-void primary_analysis();//·ÖÎö±í´ïÊ½
+void func_func();//åˆ†æå‡½æ•°è°ƒç”¨
+void func_val();//åˆ†æå‡½æ•°è°ƒç”¨é‡Œçš„å‚æ•°
+void primary_analysis();//åˆ†æè¡¨è¾¾å¼å…¥å£ï¼Œä»¥ä¸‹å‡½æ•°å‡ä¸ºåˆ†æè¡¨è¾¾å¼çš„å‡½æ•°
 void C();
 void next();
 void S();
