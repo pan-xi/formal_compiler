@@ -1,17 +1,17 @@
 #include"func.h"
 
-extern TkWord word[MAXSIZE] ;//ÓÃÀ´´æ·ÖºÃµÄ´Ê£¬func.cppÒ²ÒªÓÃ£¬ËùÒÔÉèÁËÈ«¾Ö±äÁ¿
+extern TkWord word[MAXSIZE] ;//ç”¨æ¥å­˜åˆ†å¥½çš„è¯ï¼Œfunc.cppä¹Ÿè¦ç”¨ï¼Œæ‰€ä»¥è®¾äº†å…¨å±€å˜é‡
 std::hash<std::string> h;
-int row = 1;//ÓÃrowÀ´¿ØÖÆĞĞºÅ
-extern int wordlen;//´æÈë¶àÉÙ½á¹¹ÌåÁË
-extern int Row_Error;//´æ´íÎóĞĞÊı
-extern jmp_buf jmpbuf;//¶Ïµã
-extern int JmpJud;//ÊÇ·ñ±àÒë³É¹¦µÄ±êÖ¾
-pTkWord pword;//Ê¼ÖÕÖ¸ÏòÒª½âÎöµÄÄÇ¸öwordÊı×éÔªËØ
+int row = 1;//ç”¨rowæ¥æ§åˆ¶è¡Œå·
+extern int wordlen;//å­˜å…¥å¤šå°‘ç»“æ„ä½“äº†
+extern int Row_Error;//å­˜é”™è¯¯è¡Œæ•°
+extern jmp_buf jmpbuf;//æ–­ç‚¹
+extern int JmpJud;//æ˜¯å¦ç¼–è¯‘æˆåŠŸçš„æ ‡å¿—
+pTkWord pword;//å§‹ç»ˆæŒ‡å‘è¦è§£æçš„é‚£ä¸ªwordæ•°ç»„å…ƒç´ 
 string RT;//return type
-stack <string> st;//Óöµ½{,(¾ÍÑ¹Õ»,ÓÉÓÚstr¸úcharÇ°Ãæ´Ê·¨·ÖÎö´¦Àí¹ı£¬´Ë´¦Óï·¨·ÖÎö¾Í²»ÔÙ´¦Àí
-stack <string> if_st;//ÓĞµÄÊ±ºòifºóÃæÃ»ÓĞelseËùÒÔif²»ÄÜ¸úÆäËûÒ»ÆğÑ¹Õ»,¼ÙÈçÑ¹Ò»¸ö{ºÍif£¬´ËÊ±Ã»ÓĞelseÈÃif³öÕ»£¬ÄÇ}¾Í²»ÄÜÅä¶Ô
-int finish = 0, err = 0;//finishÅĞ¶ÏÊÇ·ñÍêÁË£¬errÅĞ¶ÏÊÇ·ñ³ö´í
+stack <string> st;//é‡åˆ°{,(å°±å‹æ ˆ,ç”±äºstrè·Ÿcharå‰é¢è¯æ³•åˆ†æå¤„ç†è¿‡ï¼Œæ­¤å¤„è¯­æ³•åˆ†æå°±ä¸å†å¤„ç†
+stack <string> if_st;//æœ‰çš„æ—¶å€™ifåé¢æ²¡æœ‰elseæ‰€ä»¥ifä¸èƒ½è·Ÿå…¶ä»–ä¸€èµ·å‹æ ˆ,å‡å¦‚å‹ä¸€ä¸ª{å’Œifï¼Œæ­¤æ—¶æ²¡æœ‰elseè®©ifå‡ºæ ˆï¼Œé‚£}å°±ä¸èƒ½é…å¯¹
+int finish = 0, err = 0;//finishåˆ¤æ–­æ˜¯å¦å®Œäº†ï¼Œerråˆ¤æ–­æ˜¯å¦å‡ºé”™
 
 
 static TkWord keywords[] = {
@@ -96,33 +96,33 @@ void word_analysis(FILE * fp) {
 	int keywordslen = sizeof(keywords) / sizeof(TkWord);
 	hash_table(hashtable, keywordslen);
 	
-	char tmp_c[MAX];//ÓÃÀ´½Ófgets¶Áµ½µÄÒ»ĞĞ
+	char tmp_c[MAX];//ç”¨æ¥æ¥fgetsè¯»åˆ°çš„ä¸€è¡Œ
 	printbegin();
-	while (fgets(tmp_c, MAX, fp)) {//Íâ²ãÑ­»·¿ØÖÆ¶ÁĞĞ£¬fgetsÊÇ·µ»ØnullµÄ
+	while (fgets(tmp_c, MAX, fp)) {//å¤–å±‚å¾ªç¯æ§åˆ¶è¯»è¡Œï¼Œfgetsæ˜¯è¿”å›nullçš„
 		printf("%-4d", row);
-		int i = 0;//iÀ´¿ØÖÆtmp×ßµ½ÄÄÀï
-		while (i < strlen(tmp_c))//ÄÚ²ãÓĞ¸öÑ­»·¿ØÖÆÃ¿´ÎÈ¡µ½µÄtmpÀïÃæµÄ×Ö·û
+		int i = 0;//iæ¥æ§åˆ¶tmpèµ°åˆ°å“ªé‡Œ
+		while (i < strlen(tmp_c))//å†…å±‚æœ‰ä¸ªå¾ªç¯æ§åˆ¶æ¯æ¬¡å–åˆ°çš„tmpé‡Œé¢çš„å­—ç¬¦
 		{
 			if (tmp_c[i] == ' ' || tmp_c[i] == '\n' || tmp_c[i] == '\t') {
 				putchar(tmp_c[i++]);
 			}
-			else if (tmp_c[i] == '/' && tmp_c[i + 1] == '/') {//×¢ÊÍ£¬Î´¿¼ÂÇ/**/
+			else if (tmp_c[i] == '/' && tmp_c[i + 1] == '/') {//æ³¨é‡Šï¼Œæœªè€ƒè™‘/**/
 				meaning_p(&i,tmp_c);
 			}
-			else if (isalpha(tmp_c[i]) || isunderline(tmp_c[i])) {//±êÊ¶·û¹Ø¼ü×ÖsizeofÒ²¹éÎªÕâÀï
+			else if (isalpha(tmp_c[i]) || isunderline(tmp_c[i])) {//æ ‡è¯†ç¬¦å…³é”®å­—sizeofä¹Ÿå½’ä¸ºè¿™é‡Œ
 				keyword_p( &i, tmp_c, hashtable);
 			}
-			else if (isalnum(tmp_c[i])) {//´¦ÀíÊı×Ö
+			else if (isalnum(tmp_c[i])) {//å¤„ç†æ•°å­—
 				num_p(&i, tmp_c, hashtable);
 			}
-			else if (tmp_c[i] == '\'')//´¦Àíchar
+			else if (tmp_c[i] == '\'')//å¤„ç†char
 			{
 				char_p(&i, tmp_c);
 			}
-			else if (tmp_c[i] == '\"') {//´¦Àí×Ö·û´®
+			else if (tmp_c[i] == '\"') {//å¤„ç†å­—ç¬¦ä¸²
 				str_p(&i, tmp_c);
 			}
-			else {//Õâ¸öelse´¦ÀíÊ£ÏÂµÄÇé¿ö£¬²¢ÇÒ°ÑÁ½¸öµÄÔËËã·ûÄÃ³öÀ´µ¥¶ÀĞ´,ÈıÄ¿ÔËËã·ûÃ»ÓĞºÃÏë·¨
+			else {//è¿™ä¸ªelseå¤„ç†å‰©ä¸‹çš„æƒ…å†µï¼Œå¹¶ä¸”æŠŠä¸¤ä¸ªçš„è¿ç®—ç¬¦æ‹¿å‡ºæ¥å•ç‹¬å†™,ä¸‰ç›®è¿ç®—ç¬¦æ²¡æœ‰å¥½æƒ³æ³•
 				else_p(&i, tmp_c, hashtable);
 			}
 		}
@@ -131,7 +131,7 @@ void word_analysis(FILE * fp) {
 	}
 	fclose(fp);
 
-	for (int i = 0; i < wordlen; i++) {//ÉÏÃæ°Ñ±äÁ¿£¬±êÊ¶·ûÍ³Í³¸³³É±äÁ¿Ãû£¬´Ë´¦°ÑËü¸Ä¹ıÀ´
+	for (int i = 0; i < wordlen; i++) {//ä¸Šé¢æŠŠå˜é‡ï¼Œæ ‡è¯†ç¬¦ç»Ÿç»Ÿèµ‹æˆå˜é‡åï¼Œæ­¤å¤„æŠŠå®ƒæ”¹è¿‡æ¥
 		if (word[i].token == TK_VAL && word[i + 1].token == TK_START_L)
 			word[i].token = TK_FUNCT;
 	}
@@ -139,11 +139,11 @@ void word_analysis(FILE * fp) {
 
 
 void printbegin() {
-	printf("\n¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ªsimple compiler¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª\n\n");
+	printf("\nâ€”â€”â€”â€”â€”â€”â€”â€”â€”â€”simple compilerâ€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”\n\n");
 }
 
 void hash_table(vector <TkWord> *hashtable, int keywordslen) {
-	for (int i = 0; i < keywordslen - 1; i++) {//´´½¨¹şÏ£±í
+	for (int i = 0; i < keywordslen - 1; i++) {//åˆ›å»ºå“ˆå¸Œè¡¨
 		int value = h(keywords[i].s) % MAXSIZE;
 		hashtable[value].push_back(keywords[i]);
 	}
@@ -156,16 +156,16 @@ void meaning_p(int *p,char* tmp_c) {
 	tmp_s += "//";
 	tmp_tk = { TK_MEANING,tmp_s,row };
 	word[wordlen++] = tmp_tk;
-	//Print(tmp_s, TK_MEANING);//ÏÈ´òÓ¡³öÀ´//ÒòÎª×¢ÊÍ²»´æ
-	i += 2;//´æÈëÁË//¾ÍÒªÌø¹ıÇ°Á½¸ö£¬µÚÈı¸ö¿ªÊ¼´æÈëtmp_s
+	//Print(tmp_s, TK_MEANING);//å…ˆæ‰“å°å‡ºæ¥//å› ä¸ºæ³¨é‡Šä¸å­˜
+	i += 2;//å­˜å…¥äº†//å°±è¦è·³è¿‡å‰ä¸¤ä¸ªï¼Œç¬¬ä¸‰ä¸ªå¼€å§‹å­˜å…¥tmp_s
 	while (i < strlen(tmp_c)) {
-		tmp_s += tmp_c[i++];//¼ÌĞø´æ×¢ÊÍ
+		tmp_s += tmp_c[i++];//ç»§ç»­å­˜æ³¨é‡Š
 	}
-	Print(tmp_s, TK_MEANING);//´òÓ¡×¢ÊÍ
+	Print(tmp_s, TK_MEANING);//æ‰“å°æ³¨é‡Š
 	*p = i;
 }
 
-void keyword_p( int* p, char* tmp_c, vector <TkWord>* hashtable) {//±êÊ¶·û¹Ø¼ü×ÖsizeofÒ²¹éÎªÕâÀï
+void keyword_p( int* p, char* tmp_c, vector <TkWord>* hashtable) {//æ ‡è¯†ç¬¦å…³é”®å­—sizeofä¹Ÿå½’ä¸ºè¿™é‡Œ
 	string tmp_s;
 	TkWord tmp_tk;
 	int value;
@@ -179,7 +179,7 @@ void keyword_p( int* p, char* tmp_c, vector <TkWord>* hashtable) {//±êÊ¶·û¹Ø¼ü×Ö
 	int j = 0;
 	for (j = 0; j < hashtable[value].size(); j++) {
 		if (tmp_tk.s == hashtable[value][j].s) {
-			tmp_tk.token = hashtable[value][j].token;//¸³¹Ø¼ü×Ö£¬sizeofµÄtokenÖµ
+			tmp_tk.token = hashtable[value][j].token;//èµ‹å…³é”®å­—ï¼Œsizeofçš„tokenå€¼
 			break;
 		}
 	}
@@ -197,8 +197,8 @@ void num_p(int* p, char* tmp_c, vector <TkWord>* hashtable){
 	TkWord tmp_tk;
 	int value;
 	int i = *p;
-	int count = 0;//countÀ´´¦Àí.µÄÎÊÌâ
-	while (isalnum(tmp_c[i]) || tmp_c[i] == '.' || isalpha(tmp_c[i]))//²»¶ÏÍùÀï¶Á
+	int count = 0;//countæ¥å¤„ç†.çš„é—®é¢˜
+	while (isalnum(tmp_c[i]) || tmp_c[i] == '.' || isalpha(tmp_c[i]))//ä¸æ–­å¾€é‡Œè¯»
 	{
 		if (tmp_c[i] == '.')
 		{
@@ -211,8 +211,7 @@ void num_p(int* p, char* tmp_c, vector <TkWord>* hashtable){
 		}
 		if (isalpha(tmp_c[i])) {
 			Row_Error = row;
-			//longjmp(jmpbuf, IDENTIFY_ERROR);//Èô·¢ÏÖ×ÖÄ¸£¬¾ÍÊÇÃüÃû´íÎó
-			JmpJud = IDENTIFY_ERROR;//´Ë´¦longjmp»á±¨´í£¬ÒòÎªÔÚÍ¬Ò»¸öº¯ÊıÄÚ£¬ËùÒÔ²ÉÓÃgoto
+			JmpJud = IDENTIFY_ERROR;
 			longjmp(jmpbuf, JmpJud);
 		}
 		tmp_s += tmp_c[i++];
@@ -239,9 +238,8 @@ void char_p(int* p, char* tmp_c) {
 	TkWord tmp_tk;
 	int i = *p;
 	for (int j = 0; j < 3; j++) {
-		if (j == 3 && tmp_c[i] != '\'') {//ÔİÎ´¿¼ÂÇcharÀïÃæ´¦Àí\µÄÊÂÇé
+		if (j == 3 && tmp_c[i] != '\'') {//æš‚æœªè€ƒè™‘charé‡Œé¢å¤„ç†\çš„äº‹æƒ…
 			Row_Error = row;
-			//longjmp(jmpbuf, VAL_EXCESSIVE);
 			JmpJud = VAL_EXCESSIVE;
 			longjmp(jmpbuf, JmpJud);
 		}
@@ -258,18 +256,18 @@ void str_p(int* p, char* tmp_c) {
 	TkWord tmp_tk;
 	int i = *p;
 	tmp_s += tmp_c[i++];
-	while (tmp_c[i] != '\"') //ÔİÎ´¿¼ÂÇstrÀïÃæ´¦Àí\µÄÊÂÇé
+	while (tmp_c[i] != '\"') //æš‚æœªè€ƒè™‘stré‡Œé¢å¤„ç†\çš„äº‹æƒ…
 	{
 		tmp_s += tmp_c[i++];
 	}
 	tmp_s += tmp_c[i++];
-	tmp_tk = { TK_CSTRING,tmp_s,row };//°¦Èç¹û°ü×°³Éº¯Êı¾ÍºÃÁË£¬ÏÖÔÚ²ÅÏëÆğÀ´
+	tmp_tk = { TK_CSTRING,tmp_s,row };//å”‰å¦‚æœåŒ…è£…æˆå‡½æ•°å°±å¥½äº†ï¼Œç°åœ¨æ‰æƒ³èµ·æ¥
 	word[wordlen++] = tmp_tk;
 	Print(tmp_s, tmp_tk.token);
 	*p = i;
 }
 
-void next_target(string *tmp_s,char* tmp_c,int *p) {//tmp_s += "++";//ÒÑ¾­²»ÊÊºÏÕâÃ´Ğ´ÁË£¬±¾À´ÏëÔÚ×îºói+2£¬¿É»¹ÓĞÈı¸öµÄ¸úÒ»¸öµÄ»»²ßÂÔ
+void next_target(string *tmp_s,char* tmp_c,int *p) {//tmp_s += "++";//å·²ç»ä¸é€‚åˆè¿™ä¹ˆå†™äº†ï¼Œæœ¬æ¥æƒ³åœ¨æœ€åi+2ï¼Œå¯è¿˜æœ‰ä¸‰ä¸ªçš„è·Ÿä¸€ä¸ªçš„æ¢ç­–ç•¥
 	int i = *p;
 	*tmp_s += tmp_c[i++];
 	*tmp_s += tmp_c[i++];
@@ -290,7 +288,7 @@ void else_p(int* p, char* tmp_c, vector <TkWord>* hashtable) {
 		next_target(&tmp_s, tmp_c, &i);
 		tmp_tk.token = TK_DE_SELF;
 	}
-	else if (tmp_c[i] == '<' && tmp_c[i + 1] == '<' && tmp_c[i + 2] == '=') {//Õâ¸ö·Å<<Ç°Ãæ¿ÉÒÔÏÈÅĞ¶Ï<<=±ÜÃâÏÈÅĞ¶Ï<<
+	else if (tmp_c[i] == '<' && tmp_c[i + 1] == '<' && tmp_c[i + 2] == '=') {//è¿™ä¸ªæ”¾<<å‰é¢å¯ä»¥å…ˆåˆ¤æ–­<<=é¿å…å…ˆåˆ¤æ–­<<
 		next_target(&tmp_s, tmp_c, &i);
 		tmp_s += tmp_c[i++];
 		tmp_tk.token = TK_L_GV;
@@ -364,11 +362,11 @@ void else_p(int* p, char* tmp_c, vector <TkWord>* hashtable) {
 		next_target(&tmp_s, tmp_c, &i);
 		tmp_tk.token = TK_MEMBER;
 	}
-	else {//ÆäËûÔËËã·û
+	else {//å…¶ä»–è¿ç®—ç¬¦
 		tmp_s += tmp_c[i++];
 	}
-	tmp_tk = { tmp_tk.token,tmp_s,row };//Í³Ò»´æÈëÁË
-	if (!tmp_tk.token) {//µ±token=0ËµÃ÷×ßµÄÊÇ×îºóÒ»¸öelse£¬token»¹Ã»¸³Öµ
+	tmp_tk = { tmp_tk.token,tmp_s,row };//ç»Ÿä¸€å­˜å…¥äº†
+	if (!tmp_tk.token) {//å½“token=0è¯´æ˜èµ°çš„æ˜¯æœ€åä¸€ä¸ªelseï¼Œtokenè¿˜æ²¡èµ‹å€¼
 		value = h(tmp_s) % MAXSIZE;
 		int j = 0;
 		for (j; j < hashtable[value].size(); j++)
@@ -382,15 +380,15 @@ void else_p(int* p, char* tmp_c, vector <TkWord>* hashtable) {
 	*p = i;
 }
 
-//´òÓ¡ÑÕÉ«
+//æ‰“å°é¢œè‰²
 void Print(string ch, int token) {
-	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);//Ò»¸ö¾ä±ú£¬µ¶±ú
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);//ä¸€ä¸ªå¥æŸ„ï¼Œåˆ€æŸ„
 	if (token >= TK_FUNCT)
-		SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);//º¯ÊıºÍ±äÁ¿»ÒÉ«
+		SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);//å‡½æ•°å’Œå˜é‡ç°è‰²
 	else if (token >= TK_KW_INT)
-		SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);//×¢ÊÍºÍ¹Ø¼ü×ÖÂÌÉ«
+		SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);//æ³¨é‡Šå’Œå…³é”®å­—ç»¿è‰²
 	else if (token >= TK_CNUM)
-		SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_GREEN);//³£Á¿ºÖÉ«
+		SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_GREEN);//å¸¸é‡è¤è‰²
 	else
 		SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
 	if (-1 == ch[0]) {
@@ -407,24 +405,24 @@ void PrintWhite() {
 
 
 
-//Óï·¨·ÖÎöÈë¿Ú
+//è¯­æ³•åˆ†æå…¥å£
 void Compile(){
 	JmpJud = SUCC;
 	pword = word;
-	External_Claim();//ÏÈ½øÈëÍâ²¿ÉùÃ÷
+	External_Claim();//å…ˆè¿›å…¥å¤–éƒ¨å£°æ˜
 }
 
-//Íâ²¿ÉùÃ÷
-void External_Claim() {//Ã»Ğ´ÅĞ¶Ï}
-	if (pword == word + wordlen) {//word + wordlenÖ¸Ïò×îºóÒ»¸öÔªËØ£¬Èç¹ûpwordÏàµÈÖ¤Ã÷×ßµ½×îºóÁË
-		longjmp(jmpbuf,SUCC);//Ìø»ØÈ¥²¢´«succ
+//å¤–éƒ¨å£°æ˜
+void External_Claim() {//æ²¡å†™åˆ¤æ–­}
+	if (pword == word + wordlen) {//word + wordlenæŒ‡å‘æœ€åä¸€ä¸ªå…ƒç´ ï¼Œå¦‚æœpwordç›¸ç­‰è¯æ˜èµ°åˆ°æœ€åäº†
+		longjmp(jmpbuf,SUCC);//è·³å›å»å¹¶ä¼ succ
 	}
-	else if (TK_MEANING == pword->token) {//×¢ÊÍ£¬¶¼´æÒ»ÆğÁË£¬×¢ÊÍÒ»ÕûĞĞ¶¼ÊÇÔÚÒ»¸östructÀï
+	else if (TK_MEANING == pword->token) {//æ³¨é‡Šï¼Œéƒ½å­˜ä¸€èµ·äº†ï¼Œæ³¨é‡Šä¸€æ•´è¡Œéƒ½æ˜¯åœ¨ä¸€ä¸ªstructé‡Œ
 	}
-	else if ("#" == pword->s) {//ÊÇ²»ÊÇµ¼Èë°ü
+	else if ("#" == pword->s) {//æ˜¯ä¸æ˜¯å¯¼å…¥åŒ…
 		if (TK_DEFINE == (pword+1)->token ) {
-			//int define_count;//¼ÆÊı£¬¼Ædefine
-			pword += 4;//Ìø¹ı# define xx xx
+			//int define_count;//è®¡æ•°ï¼Œè®¡define
+			pword += 4;//è·³è¿‡# define xx xx
 		}
 		else if (TK_INCLUDE == (pword + 1)->token) {
 			while (pword->token != TK_LARGE) {
@@ -435,7 +433,7 @@ void External_Claim() {//Ã»Ğ´ÅĞ¶Ï}
 			return_error(EXTER_DEC);
 		}
 	}
-	else if (!istype) {//²»ÊÇÀàĞÍÉùÃ÷
+	else if (!istype) {//ä¸æ˜¯ç±»å‹å£°æ˜
 		return_error(EXTER_DEC);
 	}
 	else {
@@ -449,13 +447,13 @@ void External_Claim() {//Ã»Ğ´ÅĞ¶Ï}
 void type_judge() {
 	if (TK_VAL == (pword + 1)->token) {
 		int i = pword->token;
-		RT = pword->token;//´æÈëº¯Êı·µ»ØÖµÀàĞÍ
-		pword += 2;//ÄÃ¹ıÀàĞÍºÍ±äÁ¿
+		RT = pword->token;//å­˜å…¥å‡½æ•°è¿”å›å€¼ç±»å‹
+		pword += 2;//æ‹¿è¿‡ç±»å‹å’Œå˜é‡
 		val_process(i);
 	}
 	else if (TK_FUNCT == (pword + 1)->token) {
 		RT = pword->s;
-		pword += 2;//Ìø¹ı ÀàĞÍÓëº¯ÊıÃû
+		pword += 2;//è·³è¿‡ ç±»å‹ä¸å‡½æ•°å
 		func_process();
 	}
 	else if (TK_KW_TYPEDEF == pword->token) {
@@ -477,7 +475,7 @@ void type_judge() {
 
 
 void val_process(int i) {
-	if (TK_SEMICOLON==pword->token) {//;¾ÍÍÆ³ö
+	if (TK_SEMICOLON==pword->token) {//;å°±æ¨å‡º
 		return;
 	}
 	else if (TK_GIVEVAL == pword->token) {
@@ -486,7 +484,7 @@ void val_process(int i) {
 		case TK_KW_INT:
 			if (TK_CNUM == pword->token) {
 				pword++;
-				val_process(i);//µİ¹éµ÷ÓÃ×Ô¼º
+				val_process(i);//é€’å½’è°ƒç”¨è‡ªå·±
 			}
 			else {
 				return_error(VAL_ERROR);
@@ -495,7 +493,7 @@ void val_process(int i) {
 		case TK_KW_SHORT:
 			if (TK_CNUM == pword->token) {
 				pword++;
-				val_process(i);//µİ¹éµ÷ÓÃ×Ô¼º
+				val_process(i);//é€’å½’è°ƒç”¨è‡ªå·±
 			}
 			else {
 				return_error(VAL_ERROR);
@@ -504,7 +502,7 @@ void val_process(int i) {
 		case TK_KW_DOUBLE:
 			if (TK_CNUM == pword->token) {
 				pword++;
-				val_process(i);//µİ¹éµ÷ÓÃ×Ô¼º
+				val_process(i);//é€’å½’è°ƒç”¨è‡ªå·±
 			}
 			else {
 				return_error(VAL_ERROR);
@@ -513,7 +511,7 @@ void val_process(int i) {
 		case TK_KW_FLOAT:
 			if (TK_CNUM == pword->token) {
 				pword++;
-				val_process(i);//µİ¹éµ÷ÓÃ×Ô¼º
+				val_process(i);//é€’å½’è°ƒç”¨è‡ªå·±
 			}
 			else {
 				return_error(VAL_ERROR);
@@ -522,7 +520,7 @@ void val_process(int i) {
 		case TK_KW_LONG:
 			if (TK_CNUM == pword->token) {
 				pword++;
-				val_process(i);//µİ¹éµ÷ÓÃ×Ô¼º
+				val_process(i);//é€’å½’è°ƒç”¨è‡ªå·±
 			}
 			else {
 				return_error(VAL_ERROR);
@@ -531,7 +529,7 @@ void val_process(int i) {
 		case TK_KW_LONGLONG:
 			if (TK_CNUM == pword->token) {
 				pword++;
-				val_process(i);//µİ¹éµ÷ÓÃ×Ô¼º
+				val_process(i);//é€’å½’è°ƒç”¨è‡ªå·±
 			}
 			else {
 				return_error(VAL_ERROR);
@@ -540,7 +538,7 @@ void val_process(int i) {
 		case TK_KW_CHAR:
 			if (TK_CCHAR == pword->token) {
 				pword++;
-				val_process(i);//µİ¹éµ÷ÓÃ×Ô¼º
+				val_process(i);//é€’å½’è°ƒç”¨è‡ªå·±
 			}
 			else {
 				return_error(VAL_ERROR);
@@ -567,23 +565,23 @@ void val_process(int i) {
 }
 
 void func_process() {
-	if (TK_START_L != pword->token) {//²»ÊÇ£¨
+	if (TK_START_L != pword->token) {//ä¸æ˜¯ï¼ˆ
 		return_error(LACK_START_L);
 	}
-	else//ÊÇ£¨
+	else//æ˜¯ï¼ˆ
 	{
 		pword++;
 		if (TK_END_L == pword->token) {
 			pword++;
 		}
-		else {//²»ÊÇ£©¾ÍÒª´¦ÀíĞÎ²Î
+		else {//ä¸æ˜¯ï¼‰å°±è¦å¤„ç†å½¢å‚
 			func_val_process();
 			pword++;
 		}
-		if (TK_SEMICOLON == pword->token) {//ÊÇº¯ÊıÉùÃ÷
+		if (TK_SEMICOLON == pword->token) {//æ˜¯å‡½æ•°å£°æ˜
 			return;
 		}
-		else if (TK_BEGIN == pword->token) {//Èç¹ûÊÇ{£¬Ôò¿ªÊ¼´¦Àíº¯ÊıÌåÄÚ²¿
+		else if (TK_BEGIN == pword->token) {//å¦‚æœæ˜¯{ï¼Œåˆ™å¼€å§‹å¤„ç†å‡½æ•°ä½“å†…éƒ¨
 			func_body_process();
 			return;
 		}
@@ -608,14 +606,14 @@ void func_val_process() {
 		}
 		else if (TK_COMMA == pword->token) {
 			pword++;
-			func_val_process();//µİ¹é´¦ÀíĞÎ²Î
+			func_val_process();//é€’å½’å¤„ç†å½¢å‚
 		}
 		else {
 			return_error(FUNC_WRONG);
 		}
 	}
 }
-void func_body_process() {//´ËÊ±pwordÖ¸Ïò{,´Ë´¦do while»¹ÔİÎ´´¦Àí£¬¿¼ÂÇµ½ÓëwhileÀàËÆ£¬ÏÂ¸ö°æ±¾¸üĞÂ
+void func_body_process() {//æ­¤æ—¶pwordæŒ‡å‘{,æ­¤å¤„do whileè¿˜æš‚æœªå¤„ç†ï¼Œè€ƒè™‘åˆ°ä¸whileç±»ä¼¼ï¼Œä¸‹ä¸ªç‰ˆæœ¬æ›´æ–°
 	st.push(pword->s);
 	pword++;
 	if (TK_END == pword->token) {
@@ -624,9 +622,9 @@ void func_body_process() {//´ËÊ±pwordÖ¸Ïò{,´Ë´¦do while»¹ÔİÎ´´¦Àí£¬¿¼ÂÇµ½Óëwhile
 	}
 	else {
 		while (!st.empty()) {
-			switch (pword->token) {//´ËÊ±Ö¸Ïò{ÀïµÄµÚÒ»¸öÔªËØ
+			switch (pword->token) {//æ­¤æ—¶æŒ‡å‘{é‡Œçš„ç¬¬ä¸€ä¸ªå…ƒç´ 
 			case TK_MEANING:
-				pword++;//ÒòÎª½ö´æÒ»¸ö"//"ÔÚ½á¹¹ÌåÄÚ£¬¶øºóÃæµÄ×¢ÊÍ²»´æµÄ
+				pword++;//å› ä¸ºä»…å­˜ä¸€ä¸ª"//"åœ¨ç»“æ„ä½“å†…ï¼Œè€Œåé¢çš„æ³¨é‡Šä¸å­˜çš„
 				break;
 			case TK_KW_CHAR:
 				pword++;
@@ -726,20 +724,20 @@ void func_body_process() {//´ËÊ±pwordÖ¸Ïò{,´Ë´¦do while»¹ÔİÎ´´¦Àí£¬¿¼ÂÇµ½Óëwhile
 		if_st.pop();
 	}
 }
-void typedef_struct() {//´ËÊ±pwordÖ¸ÏòµÄÊÇstruct
+void typedef_struct() {//æ­¤æ—¶pwordæŒ‡å‘çš„æ˜¯struct
 	pword++;
 	if (TK_BEGIN != pword->token) {
 		pword++;
-	}//´ËÊ±£¬pwordÖ¸Ïò{
+	}//æ­¤æ—¶ï¼ŒpwordæŒ‡å‘{
 	pword++;
 	int i;
 	while (TK_END != pword->token) {
 		i = pword->token;
-		val_process(i);//½è´¦ÀíÍâ²¿ÉùÃ÷µÄ±äÁ¿È¥·ÖÎöÕâ¸ö±äÁ¿£¬·´Õı¶¼Ò»Ñù
+		val_process(i);//å€Ÿå¤„ç†å¤–éƒ¨å£°æ˜çš„å˜é‡å»åˆ†æè¿™ä¸ªå˜é‡ï¼Œåæ­£éƒ½ä¸€æ ·
 	}
 }
 
-void typedef_name() {//´ËÊ±Ö¸ÏòtypedefºóÃæµÄÄÇ¸ö
+void typedef_name() {//æ­¤æ—¶æŒ‡å‘typedefåé¢çš„é‚£ä¸ª
 	pword += 2;
 	if (TK_SEMICOLON != pword->token) {
 		return_error(EXTER_DEC);
@@ -747,12 +745,12 @@ void typedef_name() {//´ËÊ±Ö¸ÏòtypedefºóÃæµÄÄÇ¸ö
 	pword++;
 }
 
-void func_char() {//´ËÊ±Ö¸ÏòcharºóÒ»¸öÔªËØ,Ôİ²»¿¼ÂÇ¸³ÖµµÄÊ±ºò¸³Ò»¸ö±í´ïÊ½ÎÊÌâ
+void func_char() {//æ­¤æ—¶æŒ‡å‘charåä¸€ä¸ªå…ƒç´ ,æš‚ä¸è€ƒè™‘èµ‹å€¼çš„æ—¶å€™èµ‹ä¸€ä¸ªè¡¨è¾¾å¼é—®é¢˜
 	if (TK_VAL == pword->token) {
 		pword++;
 		if (TK_GIVEVAL == pword->token) {
 			pword++;
-			if (TK_CCHAR == pword->token || TK_CNUM == pword->token)//°Ü±Ê£¬Ç°ÃæÃ»°ÑfloatÓëint·Ö¿ª£¬½«´í¾Í´í°É
+			if (TK_CCHAR == pword->token || TK_CNUM == pword->token)//è´¥ç¬”ï¼Œå‰é¢æ²¡æŠŠfloatä¸intåˆ†å¼€ï¼Œå°†é”™å°±é”™å§
 			{
 				pword++;
 				if (TK_COMMA == pword->token) {
@@ -788,11 +786,11 @@ void func_char() {//´ËÊ±Ö¸ÏòcharºóÒ»¸öÔªËØ,Ôİ²»¿¼ÂÇ¸³ÖµµÄÊ±ºò¸³Ò»¸ö±í´ïÊ½ÎÊÌâ
 	}
 	
 }
-void func_num() {//´ËÊ±Ö¸µ½intÏÂÒ»¸ö
+void func_num() {//æ­¤æ—¶æŒ‡åˆ°intä¸‹ä¸€ä¸ª
 	if (TK_VAL == pword->token) {
 		primary_analysis();
 		while ("," == pword->s&&TK_VAL==(pword+1)->token) {
-			pword++;//Èç¹ûÊÇ,ÔòÌø¹ı,
+			pword++;//å¦‚æœæ˜¯,åˆ™è·³è¿‡,
 			primary_analysis();
 		}
 	}
@@ -801,9 +799,9 @@ void func_num() {//´ËÊ±Ö¸µ½intÏÂÒ»¸ö
 	}
 
 }
-void for_process() {//´ËÊ±Ö¸Ïòfor
+void for_process() {//æ­¤æ—¶æŒ‡å‘for
 	pword++;
-	int count=0;//¼ÆÊı£¬±í´ïÊ½¸öÊı
+	int count=0;//è®¡æ•°ï¼Œè¡¨è¾¾å¼ä¸ªæ•°
 	if (TK_START_L != pword->token) {
 		return_error(FOR_LACK_START_L);
 	}
@@ -813,7 +811,7 @@ void for_process() {//´ËÊ±Ö¸Ïòfor
 		pword++;
 	}
 	else {
-		if (istype) {//È±ÏİÔİÎ´´¦Àí£¬Ã»¿¼ÂÇÉÏÃæ¶¨Òå¹ı±äÁ¿²»ĞèÒªÖØĞÂÉùÃ÷Õâ¼şÊÂ
+		if (istype) {//ç¼ºé™·æš‚æœªå¤„ç†ï¼Œæ²¡è€ƒè™‘ä¸Šé¢å®šä¹‰è¿‡å˜é‡ä¸éœ€è¦é‡æ–°å£°æ˜è¿™ä»¶äº‹
 			pword++;
 		}
 		primary_analysis();
@@ -822,7 +820,7 @@ void for_process() {//´ËÊ±Ö¸Ïòfor
 		}
 		count++;
 		pword++;
-	}//µÚÒ»¸ö±í´ïÊ½´¦ÀíÍê£¬´ËÊ±Ö¸Ïò;µÄÏÂÒ»¸ö
+	}//ç¬¬ä¸€ä¸ªè¡¨è¾¾å¼å¤„ç†å®Œï¼Œæ­¤æ—¶æŒ‡å‘;çš„ä¸‹ä¸€ä¸ª
 	if (TK_SEMICOLON == pword->token) {
 		count++;
 		pword++;
@@ -834,8 +832,8 @@ void for_process() {//´ËÊ±Ö¸Ïòfor
 		}
 		count++;
 		pword++;
-	}//µÚ¶ş¸ö±í´ïÊ½´¦ÀíÍê
-	if (2 != count) {//Ç°Á½¸ö±í´ïÊ½²»È«
+	}//ç¬¬äºŒä¸ªè¡¨è¾¾å¼å¤„ç†å®Œ
+	if (2 != count) {//å‰ä¸¤ä¸ªè¡¨è¾¾å¼ä¸å…¨
 		return_error(FOR_ERROR);
 	}
 	if (TK_END_L == pword->token) {
@@ -847,12 +845,12 @@ void for_process() {//´ËÊ±Ö¸Ïòfor
 			return_error(FOR_LACK_END_L);
 		}
 		pword++;
-	}//forµÄ±í´ïÊ½´¦ÀíÍê³É£¬½ÓÏÂÀ´´¦ÀíÓĞ{µÄÇé¿öÓëÎŞ{µÄÇé¿ö
+	}//forçš„è¡¨è¾¾å¼å¤„ç†å®Œæˆï¼Œæ¥ä¸‹æ¥å¤„ç†æœ‰{çš„æƒ…å†µä¸æ— {çš„æƒ…å†µ
 	if (TK_SEMICOLON == pword->token) {
 		pword++;
 	}
 	else if (TK_BEGIN == pword->token) {
-		st.push(pword->s);//Óöµ½{Ñ¹Õ»
+		st.push(pword->s);//é‡åˆ°{å‹æ ˆ
 		pword++;
 	}
 	else if (TK_VAL == pword->token) {
@@ -866,7 +864,7 @@ void for_process() {//´ËÊ±Ö¸Ïòfor
 	}
 
 }
-void if_process() {//Ö¸Ïòif
+void if_process() {//æŒ‡å‘if
 	if_st.push(pword->s);
 	pword++;
 	if (TK_START_L != pword->token) {
@@ -889,12 +887,12 @@ void if_process() {//Ö¸Ïòif
 		return_error(LACK_ST);
 	}
 	else {
-		return;//ifÂß¼­ºÜÂÒÓĞ´ıÔÙ´ÎÕûÀí
+		return;//ifé€»è¾‘å¾ˆä¹±æœ‰å¾…å†æ¬¡æ•´ç†
 	}
 }
 void while_process() {//pword->s==while
 	pword++;
-	if (TK_START_L != pword->token) {//²»ÓÃif£¨==£© elseµÄÔ­Òò£ºÉÙĞ©Ò»µãÇ¶Ì×
+	if (TK_START_L != pword->token) {//ä¸ç”¨ifï¼ˆ==ï¼‰ elseçš„åŸå› ï¼šå°‘äº›ä¸€ç‚¹åµŒå¥—
 		return_error(WHILE_LACK_START_L);
 	}
 	pword++;
@@ -904,7 +902,7 @@ void while_process() {//pword->s==while
 	primary_analysis();
 	if (TK_END_L != pword->token) {
 		return_error(WHILE_LACK_END_L);
-	}//½ÓÏÂÀ´´¦ÀíÓĞÃ»ÓĞ{}
+	}//æ¥ä¸‹æ¥å¤„ç†æœ‰æ²¡æœ‰{}
 	pword++;
 	if (TK_BEGIN == pword->token) {
 		st.push(pword->s);
@@ -938,7 +936,7 @@ void else_process() {//pword->s==else
 	}
 }
 
-void return_process() {//returnÒ²ÓĞÎÊÌâ£¬Ã»ÓĞ³ä·Ö¿¼ÂÇµ½·µ»ØÖµÀàĞÍ£¬ÏÂ´Î°Ñ½á¹¹Ìå¶à¼ÓÒ»¸ö³ÉÔ±
+void return_process() {//returnä¹Ÿæœ‰é—®é¢˜ï¼Œæ²¡æœ‰å……åˆ†è€ƒè™‘åˆ°è¿”å›å€¼ç±»å‹ï¼Œä¸‹æ¬¡æŠŠç»“æ„ä½“å¤šåŠ ä¸€ä¸ªæˆå‘˜
 	if (RT == "void") {
 		if (TK_SEMICOLON== pword->token ) {
 			pword++;
@@ -967,7 +965,7 @@ void enum_process() {//pword->s==enum
 		return_error(LACK_BEGIN);
 	}
 	pword++;
-	while (TK_VAL == pword->token) {//ÔİÎ´´¦Àí±êÊ¶·ûÏàÍ¬µÄ£¬ÒÔ¼°Î´¸øval¸³Öµ£¬»¹ĞèÒªÒ»¸ö½á¹¹Ìå
+	while (TK_VAL == pword->token) {//æš‚æœªå¤„ç†æ ‡è¯†ç¬¦ç›¸åŒçš„ï¼Œä»¥åŠæœªç»™valèµ‹å€¼ï¼Œè¿˜éœ€è¦ä¸€ä¸ªç»“æ„ä½“
 		pword += 2;
 	}
 	if (TK_END != pword->token) {
@@ -981,7 +979,7 @@ void enum_process() {//pword->s==enum
 	return;
 }
 
-void func_func() {//µôÓÃº¯Êı,ÔİÎ´¿¼ÂÇ´«²ÎÀàĞÍÆ¥ÅäÎÊÌâ£¬ÏÂ´Î´æ¸öº¯Êı¼°¶ÔÓ¦µØÖ·
+void func_func() {//æ‰ç”¨å‡½æ•°,æš‚æœªè€ƒè™‘ä¼ å‚ç±»å‹åŒ¹é…é—®é¢˜ï¼Œä¸‹æ¬¡å­˜ä¸ªå‡½æ•°åŠå¯¹åº”åœ°å€
 	pword++;
 	if (TK_START_L != pword->token) {
 		return_error(LACK_START_L);
@@ -1031,7 +1029,7 @@ void primary_analysis() {//PWORD->TOKEN==VAL
 		return_error(PRIMARY_ERROR);
 	}
 }
-void C() {//INIT,³õµÈ±í´ïÊ½
+void C() {//INIT,åˆç­‰è¡¨è¾¾å¼
 	S();
 	while (TK_COMMA == pword->token) {
 		next();
@@ -1045,14 +1043,14 @@ void next() {
 		finish = 1;
 	}
 }
-void S() {//¸³Öµ
+void S() {//èµ‹å€¼
 	L();
 	while (pword->token <= TK_O_GV && pword->token >= TK_GIVEVAL) {
 		next();
 		L();
 	}
 }
-void L() {//Âß¼­ÔËËã·û£¬Ìõ¼şÔËËã·ûÔİÊ±´¦Àí²»À´
+void L() {//é€»è¾‘è¿ç®—ç¬¦ï¼Œæ¡ä»¶è¿ç®—ç¬¦æš‚æ—¶å¤„ç†ä¸æ¥
 	J();
 	while (pword->token >= TK_AND && pword->token <= TK_LOR) {
 		next();
