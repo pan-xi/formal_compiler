@@ -26,7 +26,7 @@
 
  **使用说明** 
 1、编译
-2、cmd运行，输入main.exe filepath
+2、cmd运行，输入main.exe filepath(ex:main.exe code.txt)
 3、code.txt为测试用例
 
  **下一步** 
